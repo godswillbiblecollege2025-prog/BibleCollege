@@ -96,6 +96,7 @@ const ContactSection = () => {
     <section
       id="contact"
       className="py-16 text-white relative overflow-hidden"
+      aria-labelledby="contact-heading"
     >
       {/* Snackbar Notification */}
       {showSnackbar && submitStatus.type && (
@@ -128,8 +129,10 @@ const ContactSection = () => {
       <div className="absolute inset-0">
         <img
           src="/images/GetInTouch.png"
-          alt="Get in Touch Background"
+          alt="Contact God's Will Bible College - Get in touch for admissions and information"
           className="w-full h-full object-cover"
+          width="1920"
+          height="1080"
         />
         <div className="absolute inset-0 bg-black opacity-0"></div>
       </div>
@@ -138,7 +141,7 @@ const ContactSection = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Left side - Contact info */}
           <div>
-            <h2 className="text-[38px] font-[700] mb-5 text-white">
+            <h2 id="contact-heading" className="text-[38px] font-[700] mb-5 text-white">
               Get in touch with us
             </h2>
             <p className="text-[18px] font-[400] mb-8 text-white leading-relaxed">
@@ -155,8 +158,10 @@ const ContactSection = () => {
                 >
                   <img
                     src={GITMail}
-                    alt="Email Icon"
+                    alt="Email contact icon for God's Will Bible College"
                     className="w-6 h-6 object-contain"
+                    width="24"
+                    height="24"
                   />
                 </div>
                 <div>
@@ -174,8 +179,10 @@ const ContactSection = () => {
                 >
                   <img
                     src={GITPhone}
-                    alt="Phone Icon"
+                    alt="Phone contact icon for God's Will Bible College"
                     className="w-6 h-6 object-contain"
+                    width="24"
+                    height="24"
                   />
                 </div>
                 <div>
@@ -193,8 +200,10 @@ const ContactSection = () => {
                 >
                   <img
                     src={GITHome}
-                    alt="Address Icon"
+                    alt="Address location icon for God's Will Bible College in Rourkela, Odisha"
                     className="w-6 h-6 object-contain"
+                    width="24"
+                    height="24"
                   />
                 </div>
                 <div>
@@ -209,7 +218,7 @@ const ContactSection = () => {
 
           {/* Right side - Contact form */}
           <div className="bg-white rounded-lg p-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6" aria-label="Contact form">
               <div>
                 <input
                   type="text"

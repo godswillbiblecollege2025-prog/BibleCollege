@@ -47,8 +47,10 @@ const EnrollCard = ({
             >
               <img
                 src={certificateImageUrl}
-                alt={`${title} Certificate`}
+                alt={`${title} Certificate - Accredited theology degree from God's Will Bible College`}
                 className="w-full h-auto"
+                width="500"
+                height="350"
               />
             </div>
           </div>

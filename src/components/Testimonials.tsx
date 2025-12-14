@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import TestimonialsBackground from '../../assets/images/Background.png'
 import { supabase } from '../lib/supabase'
+import LazyImage from './LazyImage'
 
 interface Testimonial {
   id: string
@@ -99,13 +100,14 @@ const Testimonials = () => {
         backgroundAttachment: 'fixed',
         minHeight: '100%',
       }}
+      aria-labelledby="testimonials-heading"
     >
       {/* Content */}
       <div className="relative container mx-auto px-4">
         {/* Section header */}
         <div className="mb-12">
-          <div className="w-[94px] h-[7px] bg-white mb-3"></div>
-          <h2 className="text-[38px] font-[700] mb-5 text-white">Testimonials</h2>
+          <div className="w-[94px] h-[7px] bg-white mb-3" aria-hidden="true"></div>
+          <h2 id="testimonials-heading" className="text-[38px] font-[700] mb-5 text-white">Testimonials</h2>
           <div className="flex items-start justify-between gap-4">
             <p className="text-[18px] font-[400] text-white leading-relaxed flex-1">
               Faith Journeys Shared by Our Graduates: Empowering Leaders, Equipping Servants,<span className="hidden lg:inline"><br /></span> and Impacting Nations for Christ
@@ -173,19 +175,12 @@ const Testimonials = () => {
                   <div className="flex items-center">
                     {testimonial.avatar_url ? (
                       <div className="w-10 h-10 rounded-full mr-3 flex-shrink-0 overflow-hidden">
-                        <img 
+                        <LazyImage
                           src={testimonial.avatar_url} 
-                          alt={testimonial.author}
+                          alt={`${testimonial.author} - ${testimonial.title} testimonial at God's Will Bible College`}
                           className="w-full h-full object-cover"
-                          onError={(e) => {
-                            // Fallback to gradient if image fails
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                            const parent = target.parentElement;
-                            if (parent) {
-                              parent.innerHTML = '<div class="w-full h-full bg-gradient-to-br from-gray-500 to-gray-600 rounded-full"></div>';
-                            }
-                          }}
+                          width="40"
+                          height="40"
                         />
                       </div>
                     ) : (

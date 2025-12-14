@@ -1,4 +1,5 @@
 import FacultyImg from "../../assets/images/OurFaculty.png";
+import LazyImage from './LazyImage';
 
 const OurFaculty = () => {
   const faculty = [
@@ -25,11 +26,11 @@ const OurFaculty = () => {
   ];
 
   return (
-    <section className="py-16 bg-white relative overflow-hidden">
+    <section className="py-16 bg-white relative overflow-hidden" aria-labelledby="our-faculty-heading">
       <div className="container mx-auto px-8 md:px-12 lg:px-16">
         {/* Section Heading */}
         <div className="text-left mb-12">
-          <h2 className="text-[38px] font-[700] text-[#333333] mb-5">
+          <h2 id="our-faculty-heading" className="text-[38px] font-[700] text-[#333333] mb-5">
             Our Faculty
           </h2>
           <p className="text-[18px] font-[400] text-[#333333] leading-relaxed">
@@ -56,10 +57,12 @@ const OurFaculty = () => {
           {faculty.map((member, index) => (
             <div key={index} className="text-left group relative z-10">
               <div className="relative overflow-hidden rounded-[12px] shadow-lg group-hover:shadow-xl transition-shadow duration-300">
-                <img
+                <LazyImage
                   src={member.image}
-                  alt={member.name}
+                  alt={`${member.name} - ${member.title} at God's Will Bible College, experienced faculty mentor`}
                   className="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-300"
+                  width="400"
+                  height="400"
                 />
 
                 {/* Overlay with blur only (no border) */}

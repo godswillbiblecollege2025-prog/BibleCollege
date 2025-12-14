@@ -8,6 +8,8 @@ import CourseCatalog from '../components/CourseCatalog'
 import CourseRequirements from '../components/CourseRequirements'
 import ContactSection from '../components/ContactSection'
 import EnrollCard from '../components/EnrollCard'
+import SEO from '../components/SEO'
+import { getCourseStructuredData, getBreadcrumbStructuredData } from '../utils/seoData'
 
 interface Course {
   id: string
@@ -104,8 +106,39 @@ const CourseDetail = () => {
   const curriculumData = courseContents.find(c => c.content_type === 'curriculum')?.metadata?.years
   const requirementsData = courseContents.find(c => c.content_type === 'requirements')?.metadata?.requirements
 
+  // SEO data
+  const courseDescription = course.hero_description || overviewContent.substring(0, 160) || `${course.title} at God's Will Bible College. Residential theological education in Rourkela, Odisha.`
+  const courseUrl = `https://godswillbiblecollege.com/academics/${course.slug}`
+  
+  const courseStructuredData = getCourseStructuredData({
+    title: course.title,
+    description: courseDescription,
+    duration: course.duration || undefined,
+    url: courseUrl
+  })
+
+  const breadcrumbData = getBreadcrumbStructuredData([
+    { name: "Home", url: "https://godswillbiblecollege.com" },
+    { name: "Browse Courses", url: "https://godswillbiblecollege.com/academics" },
+    { name: course.title, url: courseUrl }
+  ])
+
+  const combinedStructuredData = {
+    "@context": "https://schema.org",
+    "@graph": [courseStructuredData, breadcrumbData]
+  }
+
   return (
     <div className="bg-white">
+      <SEO
+        title={`${course.title} - God's Will Bible College | ${course.duration || 'Theology Program'}`}
+        description={courseDescription}
+        keywords={`${course.title}, theology course, Bible college program, ${course.duration || 'theology degree'}, Christian ministry training, Rourkela, Odisha, theological education`}
+        url={courseUrl}
+        image="/images/BannerImage.png"
+        type="article"
+        structuredData={combinedStructuredData}
+      />
       {/* Hero Section */}
       <CourseHero
         title={course.hero_title || course.title}

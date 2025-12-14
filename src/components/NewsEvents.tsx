@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import LazyImage from './LazyImage';
 
 interface NewsEvent {
   id: string;
@@ -85,11 +86,11 @@ const NewsEvents = () => {
 
   return (
     <>
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white" aria-labelledby="news-events-heading">
         <div className="container mx-auto px-8 md:px-12 lg:px-16">
           <div className="flex justify-between items-start mb-12">
             <div>
-              <h2 className="text-[38px] font-[700] text-[#333333] mb-5">
+              <h2 id="news-events-heading" className="text-[38px] font-[700] text-[#333333] mb-5">
                 Latest News & Events
               </h2>
               <p className="text-[18px] font-[400] text-[#333333] leading-relaxed">
@@ -114,10 +115,12 @@ const NewsEvents = () => {
                 >
                   <div className="p-[15px]">
                     <div className="aspect-video overflow-hidden rounded-[12px]">
-                      <img
+                      <LazyImage
                         src={item.image_url || "/images/Events.png"}
-                        alt={item.title}
+                        alt={`${item.title} - News and events at God's Will Bible College`}
                         className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 rounded-[12px]"
+                        width="400"
+                        height="225"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = "/images/Events.png";
                         }}
@@ -181,10 +184,12 @@ const NewsEvents = () => {
             <div className="p-6">
               {selectedNews.image_url && (
                 <div className="mb-6 rounded-lg overflow-hidden">
-                  <img
+                  <LazyImage
                     src={selectedNews.image_url}
-                    alt={selectedNews.title}
+                    alt={`${selectedNews.title} - God's Will Bible College news and events`}
                     className="w-full h-auto object-cover"
+                    width="800"
+                    height="450"
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = 'none';
                     }}

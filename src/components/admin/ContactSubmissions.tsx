@@ -56,7 +56,7 @@ const ContactSubmissions = () => {
     if (!confirm('Are you sure you want to delete this submission?')) return
 
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('contact_submissions')
         .delete()
         .eq('id', id)
@@ -186,3 +186,4 @@ const ContactSubmissions = () => {
 }
 
 export default ContactSubmissions
+

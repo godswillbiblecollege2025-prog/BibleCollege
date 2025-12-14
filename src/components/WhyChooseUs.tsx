@@ -2,6 +2,7 @@ import BiblicalFoundation from '/images/BiblicalFoundation.png';
 import GlobalMissionFocus from '/images/GlobalMissionFocus.png';
 import VibrantCommunity from '/images/vibrantCommunity.png';
 import ExpertFaculty from '/images/ExpertFaculty.png';
+import LazyImage from './LazyImage';
 
 const WhyChooseUs = () => {
   const features = [
@@ -32,13 +33,13 @@ const WhyChooseUs = () => {
   ];
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-16 bg-white" aria-labelledby="why-choose-us-heading">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Left side - Text content */}
           <div>
             <div className="w-[94px] h-[7px] bg-[#012659] mb-6"></div>
-            <h2 className="text-[38px] font-[700] text-[#333333] leading-tight mb-6">
+            <h2 id="why-choose-us-heading" className="text-[38px] font-[700] text-[#333333] leading-tight mb-6">
               Why GWBC is Your <br /> Best Choice?
             </h2>
             <p className="text-[18px] font-[400] text-[#333333] leading-relaxed">
@@ -55,10 +56,12 @@ const WhyChooseUs = () => {
                 className={`${feature.color} p-6 rounded-[12px] shadow-sm`}
               >
                 <div className="mb-4">
-                  <img 
+                  <LazyImage
                     src={feature.icon} 
-                    alt={feature.title}
+                    alt={`${feature.title} - ${feature.description.substring(0, 50)}`}
                     className="w-16 h-16 object-contain"
+                    width="64"
+                    height="64"
                   />
                 </div>
                 <h3 className="text-[20px] font-[600] text-[#333333] mb-3 leading-snug">

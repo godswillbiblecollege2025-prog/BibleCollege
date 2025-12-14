@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom'
 import BOTA from '../../assets/images/BOTA.png'
 import BOTB from '../../assets/images/BOTB.png'
 import { supabase } from '../lib/supabase'
+import SEO from '../components/SEO'
+import { getBreadcrumbStructuredData } from '../utils/seoData'
+import LazyImage from '../components/LazyImage'
 
 interface Course {
   id: string
@@ -100,8 +103,21 @@ const BrowseCourses = () => {
     course.title.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
+  const breadcrumbData = getBreadcrumbStructuredData([
+    { name: "Home", url: "https://godswillbiblecollege.com" },
+    { name: "Browse Courses", url: "https://godswillbiblecollege.com/academics" }
+  ])
+
   return (
     <div className="min-h-screen bg-white">
+      <SEO
+        title="Browse Courses - God's Will Bible College | Theology Programs"
+        description="Explore our comprehensive theology programs at God's Will Bible College. Browse our courses including Bachelor of Theology and other ministry training programs designed for Christian service across India."
+        keywords="theology courses, Bible college programs, Christian ministry courses, theology degree programs, Bible college curriculum, ministry training courses, theological education programs"
+        url="https://godswillbiblecollege.com/academics"
+        image="/images/BannerImage.png"
+        structuredData={breadcrumbData}
+      />
       <div className="container mx-auto px-4 py-16">
         {/* Header Row */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
@@ -158,16 +174,20 @@ const BrowseCourses = () => {
               >
                 {/* Course Image */}
                 <div className="relative overflow-hidden h-64">
-                  <img
+                  <LazyImage
                     src={course.image_url || BOTA}
-                    alt={course.title}
+                    alt={`${course.title} - ${course.duration || 'Theology program'} at God's Will Bible College`}
                     className="w-full h-full object-cover absolute top-0 left-0 transition-all duration-500 group-hover:opacity-0 group-hover:scale-105"
+                    width="400"
+                    height="256"
                   />
                   {course.hover_image_url && (
-                    <img
+                    <LazyImage
                       src={course.hover_image_url}
-                      alt={course.title}
+                      alt={`${course.title} course details - God's Will Bible College`}
                       className="w-full h-full object-cover absolute top-0 left-0 opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:scale-105"
+                      width="400"
+                      height="256"
                     />
                   )}
                 </div>

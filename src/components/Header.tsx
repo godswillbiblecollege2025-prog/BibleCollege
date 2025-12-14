@@ -22,16 +22,18 @@ const Header = () => {
         backgroundColor: isAcademicsPage ? '#FFFFFF' : '#1E1C52', 
         fontFamily: "'DM Sans', sans-serif" 
       }}
+      role="banner"
+      aria-label="Main navigation"
     >
       <div className="container-custom">
         <div className="flex items-center justify-between py-4">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3">
-            <img src={Logo} alt="Word Bible College Logo" className="w-12 h-12" />
+            <img src={Logo} alt="God's Will Bible College Logo - Residential theological education in Rourkela, Odisha" className="w-12 h-12" width="48" height="48" />
           </Link>
 
           {/* Navigation */}
-          <nav className="hidden md:flex items-center space-x-2">
+          <nav className="hidden md:flex items-center space-x-2" role="navigation" aria-label="Main menu">
             {navItems.map(item => {
               // Check if current path matches or starts with item path (for nested routes)
               const isActive = location.pathname === item.path || 
@@ -72,7 +74,7 @@ const Header = () => {
           </div>
 
           {/* Mobile menu button */}
-          <button className="md:hidden p-2">
+          <button className="md:hidden p-2" aria-label="Open mobile menu" aria-expanded="false">
             <svg
               className="w-6 h-6"
               fill="none"
