@@ -1,9 +1,21 @@
 import { useState } from "react";
 
-const CurriculumStructure = () => {
-  const [expandedYear, setExpandedYear] = useState(1);
+interface Year {
+  year: string
+  title: string
+  topics: string[]
+  color: string
+}
 
-  const years = [
+interface CurriculumStructureProps {
+  years?: Year[]
+}
+
+const CurriculumStructure = ({ years }: CurriculumStructureProps) => {
+  const [expandedYear, setExpandedYear] = useState<number | null>(null);
+
+  // Default years if none provided
+  const defaultYears: Year[] = [
     {
       year: "1st year",
       title: "Foundations of Theology & Scripture",
@@ -13,14 +25,7 @@ const CurriculumStructure = () => {
     {
       year: "2nd year",
       title: "Advanced Biblical & Practical Studies",
-      topics: [
-        "Introduction to the Old Testament",
-        "Introduction to the New Testament",
-        "Basics of Christian Theology",
-        "Life and Ministry of Jesus Christ",
-        "History of Christianity (Early Church)",
-        "Christian Spiritual Formation",
-      ],
+      topics: [],
       color: "#60A563",
     },
     {
@@ -36,6 +41,12 @@ const CurriculumStructure = () => {
       color: "#F0B100",
     },
   ];
+
+  const displayYears = years && years.length > 0 ? years : defaultYears;
+
+  if (!displayYears || displayYears.length === 0) {
+    return null
+  }
 
   return (
     <section
@@ -56,14 +67,14 @@ const CurriculumStructure = () => {
 
       <div style={{ background: "#F9FAFB" }} className="rounded-lg p-6">
         <div className="space-y-4">
-          {years.map((yearData, index) => (
+          {displayYears.map((yearData, index) => (
             <div
               key={index}
               className="bg-white border border-gray-200 rounded-lg overflow-hidden"
             >
               <button
                 onClick={() =>
-                  setExpandedYear(expandedYear === index ? -1 : index)
+                  setExpandedYear(expandedYear === index ? null : index)
                 }
                 className="w-full p-6 hover:bg-gray-50 transition-colors"
               >
@@ -78,48 +89,55 @@ const CurriculumStructure = () => {
                       </span>
                     </div>
                     <h3
-                      className="text-left whitespace-nowrap overflow-hidden text-ellipsis"
+                      className="text-left break-words"
                       style={{
                         fontSize: "22px",
                         fontWeight: 600,
                         color: "#333333",
                         fontFamily: "Montserrat, sans-serif",
+                        wordWrap: 'break-word',
+                        overflowWrap: 'break-word'
                       }}
                     >
-                      {yearData.title}
+                      {yearData.title || `Year ${index + 1}`}
                     </h3>
                   </div>
-                  <svg
-                    className={`w-6 h-6 text-gray-600 transition-transform ${
-                      expandedYear === index ? "rotate-180" : ""
-                    }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
+                  {yearData.topics && yearData.topics.length > 0 && (
+                    <svg
+                      className={`w-6 h-6 text-gray-600 transition-transform ${
+                        expandedYear === index ? "rotate-180" : ""
+                      }`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  )}
                 </div>
               </button>
 
-              {expandedYear === index && yearData.topics.length > 0 && (
+              {expandedYear === index && yearData.topics && yearData.topics.length > 0 && (
                 <div className="px-6 pb-6 border-t border-gray-100">
                   <ul className="space-y-3 mt-4">
                     {yearData.topics.map((topic, topicIndex) => (
                       <li key={topicIndex} className="flex items-start space-x-3">
                         <div className="w-1.5 h-1.5 bg-blue-600 rounded-full flex-shrink-0 mt-2"></div>
                         <span
+                          className="break-words"
                           style={{
                             fontSize: "18px",
                             fontWeight: 500,
                             color: "#333333",
                             fontStyle: "italic",
                             fontFamily: "Montserrat, sans-serif",
+                            wordWrap: 'break-word',
+                            overflowWrap: 'break-word'
                           }}
                         >
                           {topic}

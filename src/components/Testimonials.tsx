@@ -1,38 +1,46 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TestimonialsBackground from '../../assets/images/Background.png'
+import { supabase } from '../lib/supabase'
+
+interface Testimonial {
+  id: string
+  text: string
+  author: string
+  title: string
+  avatar_url: string | null
+}
 
 const Testimonials = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  
-  const testimonials = [
-    {
-      text: "Life-changing when I first joined, I had a passion for ministry but lacked direction. Through the dedicated mentorship of my professors, deep biblical teachings, and a strong community of believers, I discovered my calling to serve as a youth pastor.",
-      author: "Robert S",
-      title: "Canada"
-    },
-    {
-      text: "The theological education I received here transformed not just my knowledge, but my entire approach to ministry. The faculty's commitment to both academic excellence and spiritual formation prepared me to lead with wisdom and compassion in my pastoral role.",
-      author: "Sarah M",
-      title: "United States"
-    },
-    {
-      text: "As an international student, I was welcomed into a diverse community that enriched my understanding of global Christianity. The cross-cultural learning environment and mission focus equipped me to serve effectively in my home country.",
-      author: "David K",
-      title: "Nigeria"
-    },
-    {
-      text: "The practical ministry training combined with solid biblical foundation gave me the confidence to step into leadership roles I never thought possible. The mentorship and community support were invaluable.",
-      author: "Maria L",
-      title: "Brazil"
-    },
-    {
-      text: "Through rigorous academic study and hands-on ministry experience, I developed both the knowledge and character needed for effective Christian leadership. The faculty's investment in my growth was truly life-changing.",
-      author: "James W",
-      title: "United Kingdom"
-    }
-  ];
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const maxIndex = testimonials.length - 2; // Show 2 cards at a time
+  useEffect(() => {
+    fetchTestimonials();
+  }, []);
+
+  const fetchTestimonials = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('testimonials')
+        .select('id, text, author, title, avatar_url')
+        .eq('is_active', true)
+        .order('order_index', { ascending: true })
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        setTestimonials(data);
+      }
+    } catch (error) {
+      console.error('Error fetching testimonials:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const maxIndex = testimonials.length > 2 ? testimonials.length - 2 : 0; // Show 2 cards at a time
 
   const handlePrev = () => {
     setCurrentIndex(prev => prev > 0 ? prev - 1 : 0);
@@ -41,6 +49,46 @@ const Testimonials = () => {
   const handleNext = () => {
     setCurrentIndex(prev => prev < maxIndex ? prev + 1 : maxIndex);
   };
+
+  if (loading) {
+    return (
+      <section
+        className="py-16 relative overflow-hidden bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url(${TestimonialsBackground})`,
+          backgroundSize: 'cover',
+          backgroundAttachment: 'fixed',
+          minHeight: '100%',
+        }}
+      >
+        <div className="relative container mx-auto px-4">
+          <div className="text-center py-12">
+            <p className="text-white">Loading testimonials...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (testimonials.length === 0) {
+    return (
+      <section
+        className="py-16 relative overflow-hidden bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url(${TestimonialsBackground})`,
+          backgroundSize: 'cover',
+          backgroundAttachment: 'fixed',
+          minHeight: '100%',
+        }}
+      >
+        <div className="relative container mx-auto px-4">
+          <div className="text-center py-12">
+            <p className="text-white">No testimonials available at the moment.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -63,26 +111,28 @@ const Testimonials = () => {
               Faith Journeys Shared by Our Graduates: Empowering Leaders, Equipping Servants,<span className="hidden lg:inline"><br /></span> and Impacting Nations for Christ
             </p>
             {/* Navigation arrows */}
-            <div className="flex space-x-2 flex-shrink-0">
-              <button 
-                onClick={handlePrev}
-                disabled={currentIndex === 0}
-                className="w-10 h-10 border-2 border-white rounded-full flex items-center justify-center bg-[#ffffff33] hover:bg-[#ffffff55] transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button 
-                onClick={handleNext}
-                disabled={currentIndex === maxIndex}
-                className="w-10 h-10 border-2 border-white rounded-full flex items-center justify-center bg-[#ffffff33] hover:bg-[#ffffff55] transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
+            {testimonials.length > 2 && (
+              <div className="flex space-x-2 flex-shrink-0">
+                <button 
+                  onClick={handlePrev}
+                  disabled={currentIndex === 0}
+                  className="w-10 h-10 border-2 border-white rounded-full flex items-center justify-center bg-[#ffffff33] hover:bg-[#ffffff55] transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <button 
+                  onClick={handleNext}
+                  disabled={currentIndex === maxIndex}
+                  className="w-10 h-10 border-2 border-white rounded-full flex items-center justify-center bg-[#ffffff33] hover:bg-[#ffffff55] transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -92,9 +142,9 @@ const Testimonials = () => {
             className="flex transition-transform duration-500 ease-in-out cursor-grab active:cursor-grabbing"
             style={{ transform: `translateX(-${currentIndex * 51}%)` }}
           >
-            {testimonials.map((testimonial, index) => (
+            {testimonials.map((testimonial) => (
               <div 
-                key={index} 
+                key={testimonial.id} 
                 className="flex-shrink-0 px-3"
                 style={{ width: '49%' }}
               >
@@ -115,15 +165,38 @@ const Testimonials = () => {
                   </div>
                   
                   {/* Testimonial text */}
-                  <p className="text-[18px] font-normal text-white mb-6 leading-relaxed">
+                  <p className="text-[18px] font-normal text-white mb-6 leading-relaxed break-words">
                     {testimonial.text}
                   </p>
                   
                   {/* Author info */}
                   <div className="flex items-center">
-                    <div className="w-10 h-10 bg-gray-600 rounded-full mr-3 flex-shrink-0 overflow-hidden">
-                      <div className="w-full h-full bg-gradient-to-br from-gray-500 to-gray-600 rounded-full"></div>
-                    </div>
+                    {testimonial.avatar_url ? (
+                      <div className="w-10 h-10 rounded-full mr-3 flex-shrink-0 overflow-hidden">
+                        <img 
+                          src={testimonial.avatar_url} 
+                          alt={testimonial.author}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            // Fallback to gradient if image fails
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            const parent = target.parentElement;
+                            if (parent) {
+                              parent.innerHTML = '<div class="w-full h-full bg-gradient-to-br from-gray-500 to-gray-600 rounded-full"></div>';
+                            }
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-10 h-10 bg-gray-600 rounded-full mr-3 flex-shrink-0 overflow-hidden">
+                        <div className="w-full h-full bg-gradient-to-br from-gray-500 to-gray-600 rounded-full flex items-center justify-center">
+                          <span className="text-white font-bold text-sm">
+                            {testimonial.author[0]?.toUpperCase() || '?'}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                     <div>
                       <h4 className="font-bold text-sm text-white">{testimonial.author}</h4>
                       <p className="text-gray-300 text-xs">{testimonial.title}</p>

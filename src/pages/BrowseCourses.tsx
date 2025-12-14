@@ -1,45 +1,100 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import BOTA from '../../assets/images/BOTA.png'
 import BOTB from '../../assets/images/BOTB.png'
+import { supabase } from '../lib/supabase'
+
+interface Course {
+  id: string
+  title: string
+  duration: string | null
+  image_url: string | null
+  hover_image_url: string | null
+  path: string | null
+  slug: string
+}
 
 const BrowseCourses = () => {
   const [searchQuery, setSearchQuery] = useState('')
+  const [courses, setCourses] = useState<Course[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const courses = [
-    {
-      id: 'bachelor-of-theology',
-      title: 'Bachelor of Theology',
-      duration: '4 years',
-      image: BOTA,
-      hoverImage: BOTB,
-      path: '/academics/bachelor-of-theology'
-    },
-    {
-      id: 'bachelor-of-theology-2',
-      title: 'Bachelor of Theology',
-      duration: '4 years',
-      image: BOTB,
-      hoverImage: BOTA,
-      path: '/academics/bachelor-of-theology'
-    },
-    {
-      id: 'bachelor-of-theology-3',
-      title: 'Bachelor of Theology',
-      duration: '4 years',
-      image: BOTA,
-      hoverImage: BOTB,
-      path: '/academics/bachelor-of-theology'
-    },
-    {
-      id: 'bachelor-of-theology-4',
-      title: 'Bachelor of Theology',
-      duration: '4 years',
-      image: BOTB,
-      hoverImage: BOTA,
-      path: '/academics/bachelor-of-theology'
+  useEffect(() => {
+    fetchCourses()
+  }, [])
+
+  const fetchCourses = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('courses')
+        .select('id, title, duration, image_url, hover_image_url, path, slug')
+        .eq('is_active', true)
+        .order('order_index', { ascending: true })
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+
+      if (data && data.length > 0) {
+        setCourses(data)
+      } else {
+        // Fallback to static data if database is empty
+        setCourses([
+          {
+            id: 'bachelor-of-theology',
+            title: 'Bachelor of Theology',
+            duration: '4 years',
+            image_url: BOTA,
+            hover_image_url: BOTB,
+            path: '/academics/bachelor-of-theology',
+            slug: 'bachelor-of-theology'
+          },
+          {
+            id: 'bachelor-of-theology-2',
+            title: 'Bachelor of Theology',
+            duration: '4 years',
+            image_url: BOTB,
+            hover_image_url: BOTA,
+            path: '/academics/bachelor-of-theology',
+            slug: 'bachelor-of-theology-2'
+          },
+          {
+            id: 'bachelor-of-theology-3',
+            title: 'Bachelor of Theology',
+            duration: '4 years',
+            image_url: BOTA,
+            hover_image_url: BOTB,
+            path: '/academics/bachelor-of-theology',
+            slug: 'bachelor-of-theology-3'
+          },
+          {
+            id: 'bachelor-of-theology-4',
+            title: 'Bachelor of Theology',
+            duration: '4 years',
+            image_url: BOTB,
+            hover_image_url: BOTA,
+            path: '/academics/bachelor-of-theology',
+            slug: 'bachelor-of-theology-4'
+          }
+        ])
+      }
+    } catch (error) {
+      console.error('Error fetching courses:', error)
+      // On error, use fallback static data
+      setCourses([
+        {
+          id: 'bachelor-of-theology',
+          title: 'Bachelor of Theology',
+          duration: '4 years',
+          image_url: BOTA,
+          hover_image_url: BOTB,
+          path: '/academics/bachelor-of-theology',
+          slug: 'bachelor-of-theology'
+        }
+      ])
+    } finally {
+      setLoading(false)
     }
-  ]
+  }
 
   const filteredCourses = courses.filter(course =>
     course.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -85,61 +140,67 @@ const BrowseCourses = () => {
         <div className="border-t border-[#E6E6E6] mb-8"></div>
 
         {/* Courses Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {filteredCourses.map((course) => (
-            <Link
-              key={course.id}
-              to={course.path}
-              className="group border border-[#E6E6E6] rounded-lg overflow-hidden transform transition-all duration-500 hover:-translate-y-1 hover:shadow-lg"
-            >
-              {/* Course Image */}
-              <div className="relative overflow-hidden h-64">
-                <img
-                  src={course.image}
-                  alt={course.title}
-                  className="w-full h-full object-cover absolute top-0 left-0 transition-all duration-500 group-hover:opacity-0 group-hover:scale-105"
-                />
-                <img
-                  src={course.hoverImage}
-                  alt={course.title}
-                  className="w-full h-full object-cover absolute top-0 left-0 opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:scale-105"
-                />
-              </div>
-
-              {/* Course Info */}
-              <div className="p-4">
-                <h3 className="text-[22px] font-[600] text-[#333333] mb-2 transition-colors duration-300 group-hover:text-[#012659]">
-                  {course.title}
-                </h3>
-                <div className="flex items-center text-[14px] font-[500] text-[#333333]">
-                  <svg
-                    className="w-4 h-4 mr-2 text-[#012659]"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  <span>{course.duration}</span>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        {/* No Results Message */}
-        {filteredCourses.length === 0 && (
+        {loading ? (
+          <div className="text-center py-12 text-gray-500">Loading courses...</div>
+        ) : filteredCourses.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-[18px] font-[400] text-[#636363]">
               No courses found matching "{searchQuery}"
             </p>
           </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {filteredCourses.map((course) => (
+              <Link
+                key={course.id}
+                to={course.path || `/academics/${course.slug}`}
+                className="group border border-[#E6E6E6] rounded-lg overflow-hidden transform transition-all duration-500 hover:-translate-y-1 hover:shadow-lg"
+              >
+                {/* Course Image */}
+                <div className="relative overflow-hidden h-64">
+                  <img
+                    src={course.image_url || BOTA}
+                    alt={course.title}
+                    className="w-full h-full object-cover absolute top-0 left-0 transition-all duration-500 group-hover:opacity-0 group-hover:scale-105"
+                  />
+                  {course.hover_image_url && (
+                    <img
+                      src={course.hover_image_url}
+                      alt={course.title}
+                      className="w-full h-full object-cover absolute top-0 left-0 opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:scale-105"
+                    />
+                  )}
+                </div>
+
+                {/* Course Info */}
+                <div className="p-4">
+                  <h3 className="text-[22px] font-[600] text-[#333333] mb-2 transition-colors duration-300 group-hover:text-[#012659]">
+                    {course.title}
+                  </h3>
+                  {course.duration && (
+                    <div className="flex items-center text-[14px] font-[500] text-[#333333]">
+                      <svg
+                        className="w-4 h-4 mr-2 text-[#012659]"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      <span>{course.duration}</span>
+                    </div>
+                  )}
+                </div>
+              </Link>
+            ))}
+          </div>
         )}
+
       </div>
     </div>
   )

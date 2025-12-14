@@ -1,8 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import GITMail from "/images/GITMail.png";
 import GITPhone from "/images/GITPhone.png";
 import GITHome from "/images/GITHome.png";
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ErrorIcon from "@mui/icons-material/Error";
+import CloseIcon from "@mui/icons-material/Close";
+import { supabase } from "../lib/supabase";
 
 const ContactSection = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +17,19 @@ const ContactSection = () => {
     courseType: "",
     select: "",
   });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<{ type: 'success' | 'error' | null; message: string }>({ type: null, message: '' });
+  const [showSnackbar, setShowSnackbar] = useState(false);
+
+  // Auto-hide snackbar after 5 seconds
+  useEffect(() => {
+    if (showSnackbar) {
+      const timer = setTimeout(() => {
+        setShowSnackbar(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showSnackbar]);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -26,9 +43,53 @@ const ContactSection = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
+    setSubmitting(true);
+    setSubmitStatus({ type: null, message: '' });
+
+    try {
+      // Check if Supabase is configured
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      if (!supabaseUrl || supabaseUrl.includes('placeholder')) {
+        console.warn('Supabase not configured - form submission skipped');
+        setSubmitStatus({ type: 'error', message: 'Form submission is not configured yet. Please contact us directly.' });
+        setShowSnackbar(true);
+        setSubmitting(false);
+        return;
+      }
+
+      const { error } = await supabase
+        .from('contact_submissions')
+        .insert([{
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone || null,
+          message: formData.message,
+          course_type: formData.courseType || null,
+          selected_course: formData.select || null,
+        }]);
+
+      if (error) throw error;
+
+      setSubmitStatus({ type: 'success', message: 'Thank you! Your message has been submitted successfully.' });
+      setShowSnackbar(true);
+      // Reset form
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        message: "",
+        courseType: "",
+        select: "",
+      });
+    } catch (error: any) {
+      console.error('Error submitting form:', error);
+      setSubmitStatus({ type: 'error', message: 'Failed to submit. Please try again later.' });
+      setShowSnackbar(true);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -36,6 +97,33 @@ const ContactSection = () => {
       id="contact"
       className="py-16 text-white relative overflow-hidden"
     >
+      {/* Snackbar Notification */}
+      {showSnackbar && submitStatus.type && (
+        <div
+          className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-6 py-4 rounded-lg shadow-2xl transform transition-all duration-300 ${
+            submitStatus.type === 'success'
+              ? 'bg-green-600 text-white'
+              : 'bg-red-600 text-white'
+          }`}
+          style={{
+            animation: 'slideIn 0.3s ease-out',
+          }}
+        >
+          {submitStatus.type === 'success' ? (
+            <CheckCircleIcon className="text-white" />
+          ) : (
+            <ErrorIcon className="text-white" />
+          )}
+          <span className="font-medium">{submitStatus.message}</span>
+          <button
+            onClick={() => setShowSnackbar(false)}
+            className="ml-2 hover:bg-white/20 rounded-full p-1 transition-colors"
+          >
+            <CloseIcon className="text-white text-sm" />
+          </button>
+        </div>
+      )}
+
       {/* Background image */}
       <div className="absolute inset-0">
         <img
@@ -129,7 +217,7 @@ const ContactSection = () => {
                   name="name"
                   value={formData.name}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-bible-blue focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-bible-blue focus:border-transparent text-black"
                   placeholder="Name"
                   required
                 />
@@ -142,7 +230,7 @@ const ContactSection = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-bible-blue focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-bible-blue focus:border-transparent text-black"
                   placeholder="Email"
                   required
                 />
@@ -155,7 +243,7 @@ const ContactSection = () => {
                   name="phone"
                   value={formData.phone}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-bible-blue focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-bible-blue focus:border-transparent text-black"
                   placeholder="Phone Number"
                 />
               </div>
@@ -167,7 +255,7 @@ const ContactSection = () => {
                   name="message"
                   value={formData.message}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-bible-blue focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-bible-blue focus:border-transparent text-black"
                   placeholder="Message"
                   required
                 />
@@ -180,7 +268,7 @@ const ContactSection = () => {
                   name="courseType"
                   value={formData.courseType}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-bible-blue focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-bible-blue focus:border-transparent text-black"
                   placeholder="What type of course"
                 />
               </div>
@@ -191,8 +279,7 @@ const ContactSection = () => {
                   name="select"
                   value={formData.select}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-bible-blue focus:border-transparent"
-                  style={{ color: "#00000099" }}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-bible-blue focus:border-transparent text-black"
                 >
                   <option value="">Select</option>
                   <option value="bachelor">Bachelor of Theology</option>
@@ -203,13 +290,16 @@ const ContactSection = () => {
 
               <button
                 type="submit"
-                className="group w-full bg-bible-blue text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2 hover:bg-blue-800 transition-colors duration-300"
+                disabled={submitting}
+                className="group w-full bg-bible-blue text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2 hover:bg-blue-800 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ backgroundColor: "#15133D" }}
               >
                 <span className="transition-transform duration-300 group-hover:-translate-x-2">
-                  Schedule a call
+                  {submitting ? 'Submitting...' : 'Schedule a call'}
                 </span>
-                <ArrowRightAltIcon className="opacity-0 transform translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0" />
+                {!submitting && (
+                  <ArrowRightAltIcon className="opacity-0 transform translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0" />
+                )}
               </button>
             </form>
           </div>

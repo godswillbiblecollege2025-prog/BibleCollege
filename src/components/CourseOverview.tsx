@@ -1,4 +1,11 @@
-const CourseOverview = () => {
+interface CourseOverviewProps {
+  content?: string
+}
+
+const CourseOverview = ({ content = '' }: CourseOverviewProps) => {
+  // Split content by paragraphs (double newlines or single newlines)
+  const paragraphs = content ? content.split(/\n\n|\n/).filter(p => p.trim()) : []
+
   return (
     <section className="bg-white" style={{ paddingTop: '4rem'}}>
       <h2 
@@ -12,29 +19,38 @@ const CourseOverview = () => {
       >
         Course Overview
       </h2>
-      <p 
-        className="mb-12 leading-relaxed"
-        style={{ 
-          fontSize: '18px', 
-          fontWeight: 400, 
-          color: '#545454',
-          fontFamily: 'Montserrat, sans-serif'
-        }}
-      >
-        The Bachelor of Theology is a 3 to 4-year undergraduate degree designed for individuals seeking a deeper understanding of Christian faith, scripture, and ministry. The program provides a strong foundation in biblical studies, systematic theology, church history, ethics, and pastoral care, equipping students with the knowledge and skills required for leadership in Christian ministry and related fields.
-      </p>
-      <p 
-        className="mb-12 leading-relaxed"
-        style={{ 
-          fontSize: '18px', 
-          fontWeight: 400, 
-          color: '#545454',
-          fontFamily: 'Montserrat, sans-serif'
-        }}
-      >
-        Students develop critical thinking, preaching, teaching, and counseling abilities while gaining practical insights into mission work, community service, and spiritual development.
-      </p>
+      {paragraphs.length > 0 ? (
+        paragraphs.map((paragraph, index) => (
+          <p 
+            key={index}
+            className="mb-12 leading-relaxed break-words"
+            style={{ 
+              fontSize: '18px', 
+              fontWeight: 400, 
+              color: '#545454',
+              fontFamily: 'Montserrat, sans-serif',
+              wordWrap: 'break-word',
+              overflowWrap: 'break-word'
+            }}
+          >
+            {paragraph.trim()}
+          </p>
+        ))
+      ) : (
+        <p 
+          className="mb-12 leading-relaxed"
+          style={{ 
+            fontSize: '18px', 
+            fontWeight: 400, 
+            color: '#545454',
+            fontFamily: 'Montserrat, sans-serif'
+          }}
+        >
+          Course overview information will be available soon.
+        </p>
+      )}
     </section>
   );
 };
-export default CourseOverview
+
+export default CourseOverview;

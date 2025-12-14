@@ -1,4 +1,20 @@
-const CourseCatalog = () => {
+interface CourseCatalogProps {
+  fileUrl?: string | null
+  fileName?: string | null
+  fileSize?: string | null
+}
+
+const CourseCatalog = ({ fileUrl, fileName, fileSize }: CourseCatalogProps) => {
+  const handleDownload = () => {
+    if (fileUrl) {
+      window.open(fileUrl, '_blank')
+    }
+  }
+
+  if (!fileUrl) {
+    return null // Don't show catalog section if no file
+  }
+
   return (
     <section className="bg-white" style={{ paddingTop: '0', paddingBottom: '4rem' }}>
       <h2 
@@ -30,23 +46,26 @@ const CourseCatalog = () => {
                   fontFamily: 'Montserrat, sans-serif'
                 }}
               >
-                GWBC Course Catalog 2025.PDF
+                {fileName || 'Course Catalog'}
               </p>
-              <p 
-                className="mt-0.5"
-                style={{ 
-                  fontSize: '12px', 
-                  fontWeight: 400, 
-                  color: '#000000',
-                  fontFamily: 'Montserrat, sans-serif'
-                }}
-              >
-                451.03 KB
-              </p>
+              {fileSize && (
+                <p 
+                  className="mt-0.5"
+                  style={{ 
+                    fontSize: '12px', 
+                    fontWeight: 400, 
+                    color: '#000000',
+                    fontFamily: 'Montserrat, sans-serif'
+                  }}
+                >
+                  {fileSize}
+                </p>
+              )}
             </div>
           </div>
 
           <button 
+            onClick={handleDownload}
             className="px-5 py-2.5 rounded-lg transition-colors duration-200 flex items-center space-x-2 flex-shrink-0"
             style={{ 
               backgroundColor: '#030213',
@@ -66,4 +85,5 @@ const CourseCatalog = () => {
     </section>
   );
 };
+
 export default CourseCatalog;

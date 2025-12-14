@@ -2,27 +2,58 @@ import WorkspacePremiumOutlinedIcon from "@mui/icons-material/WorkspacePremiumOu
 import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 
-const CourseRequirements = () => {
-  const requirements = [
+interface Requirement {
+  title: string
+  icon: string
+  bgColor: string
+  borderColor: string
+}
+
+interface CourseRequirementsProps {
+  requirements?: Requirement[]
+}
+
+const CourseRequirements = ({ requirements }: CourseRequirementsProps) => {
+  // Default requirements if none provided
+  const defaultRequirements: Requirement[] = [
     {
-      icon: <SchoolOutlinedIcon sx={{ fontSize: 28, color: "#155DFC" }} />,
+      icon: "school",
       title: "12th Grade Completion Certificate",
       bgColor: "#EFF6FF",
       borderColor: "#155DFC",
     },
     {
-      icon: <WorkspacePremiumOutlinedIcon sx={{ fontSize: 28, color: "#00A63E" }} />,
+      icon: "certificate",
       title: "Minimum 50% aggregate marks",
       bgColor: "#F0FDF4",
       borderColor: "#00A63E",
     },
     {
-      icon: <DescriptionOutlinedIcon sx={{ fontSize: 28, color: "#9810FA" }} />,
+      icon: "document",
       title: "Character certificate from previous institution",
       bgColor: "#FAF5FF",
       borderColor: "#9810FA",
     },
   ];
+
+  const displayRequirements = requirements && requirements.length > 0 ? requirements : defaultRequirements;
+
+  const getIcon = (iconType: string) => {
+    switch (iconType) {
+      case "school":
+        return <SchoolOutlinedIcon sx={{ fontSize: 28, color: "#155DFC" }} />;
+      case "certificate":
+        return <WorkspacePremiumOutlinedIcon sx={{ fontSize: 28, color: "#00A63E" }} />;
+      case "document":
+        return <DescriptionOutlinedIcon sx={{ fontSize: 28, color: "#9810FA" }} />;
+      default:
+        return <SchoolOutlinedIcon sx={{ fontSize: 28, color: "#155DFC" }} />;
+    }
+  };
+
+  if (!displayRequirements || displayRequirements.length === 0) {
+    return null
+  }
 
   return (
     <section
@@ -44,10 +75,13 @@ const CourseRequirements = () => {
 
       <div style={{ background: "#F9FAFB" }} className="rounded-lg p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {requirements.map((requirement, index) => (
+          {displayRequirements.map((requirement, index) => (
             <div
               key={index}
               className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow duration-300 flex items-center space-x-3"
+              style={{
+                borderColor: requirement.borderColor,
+              }}
             >
               <div
                 className="w-14 h-14 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -55,16 +89,18 @@ const CourseRequirements = () => {
                   background: requirement.bgColor,
                 }}
               >
-                {requirement.icon}
+                {getIcon(requirement.icon)}
               </div>
               <p
-                className="flex-1 h-14 flex items-center"
+                className="flex-1 h-14 flex items-center break-words"
                 style={{
                   fontSize: "14px",
                   fontWeight: 600,
                   color: "#0A0A0A",
                   fontFamily: "Montserrat, sans-serif",
                   lineHeight: "1.4",
+                  wordWrap: 'break-word',
+                  overflowWrap: 'break-word'
                 }}
               >
                 {requirement.title}
