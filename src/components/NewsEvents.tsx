@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import LazyImage from './LazyImage';
@@ -13,10 +14,9 @@ interface NewsEvent {
 }
 
 const NewsEvents = () => {
+  const navigate = useNavigate();
   const [news, setNews] = useState<NewsEvent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedNews, setSelectedNews] = useState<NewsEvent | null>(null);
-  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     fetchNewsEvents();
@@ -62,14 +62,11 @@ const NewsEvents = () => {
     return text.substring(0, maxLength).trim() + '...';
   };
 
-  const handleReadMore = (item: NewsEvent) => {
-    setSelectedNews(item);
-    setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-    setSelectedNews(null);
+  const handleReadMore = (item: NewsEvent, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
+    navigate(`/news/${item.id}`);
   };
 
   if (loading) {
@@ -97,7 +94,10 @@ const NewsEvents = () => {
                 Learn from dedicated mentors who are experts in their fields and passionate about your<span className="hidden lg:inline"><br /></span> spiritual and academic growth.
               </p>
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 rounded-[6px] bg-[#15133D] text-[12px] font-medium text-[#ffffff]">
+            <button 
+              onClick={() => navigate('/news')}
+              className="flex items-center gap-2 px-4 py-2 rounded-[6px] bg-[#15133D] text-[12px] font-medium text-[#ffffff] hover:bg-[#1a1650] transition-colors"
+            >
               View All <ChevronRightIcon style={{ color: "#ffffff" }} />
             </button>
           </div>
@@ -111,7 +111,8 @@ const NewsEvents = () => {
               {news.map((item) => (
                 <article
                   key={item.id}
-                  className="bg-white rounded-[12px] shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+                  className="bg-white rounded-[12px] shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+                  onClick={() => navigate(`/news/${item.id}`)}
                 >
                   <div className="p-[15px]">
                     <div className="aspect-video overflow-hidden rounded-[12px]">
@@ -136,7 +137,7 @@ const NewsEvents = () => {
                       {truncateDescription(item.description, 52)}
                     </p>
                     <button
-                      onClick={() => handleReadMore(item)}
+                      onClick={(e) => handleReadMore(item, e)}
                       className="text-bible-blue font-medium hover:text-bible-purple transition-colors duration-200 cursor-pointer"
                     >
                       Read More
@@ -148,76 +149,6 @@ const NewsEvents = () => {
           )}
         </div>
       </section>
-
-      {/* Read More Modal */}
-      {showModal && selectedNews && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-          onClick={closeModal}
-        >
-          <div 
-            className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Header */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex justify-between items-start">
-              <div className="flex-1">
-                <h3 className="text-2xl font-bold text-[#1A2633] mb-2">
-                  {selectedNews.title}
-                </h3>
-                <p className="text-bible-gold font-medium">
-                  {formatDate(selectedNews.date)}
-                </p>
-              </div>
-              <button
-                onClick={closeModal}
-                className="ml-4 text-gray-500 hover:text-gray-700 transition-colors"
-                aria-label="Close modal"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Modal Content */}
-            <div className="p-6">
-              {selectedNews.image_url && (
-                <div className="mb-6 rounded-lg overflow-hidden">
-                  <LazyImage
-                    src={selectedNews.image_url}
-                    alt={`${selectedNews.title} - God's Will Bible College news and events`}
-                    className="w-full h-auto object-cover"
-                    width="800"
-                    height="450"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
-                  />
-                </div>
-              )}
-              <div className="prose max-w-none">
-                <p className="text-[16px] font-normal text-[#333333] leading-relaxed whitespace-pre-wrap">
-                  {selectedNews.description}
-                </p>
-              </div>
-              {selectedNews.read_more_link && (
-                <div className="mt-6">
-                  <a
-                    href={selectedNews.read_more_link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-[#15133D] text-white rounded-lg hover:bg-[#1a1650] transition-colors font-medium"
-                  >
-                    Learn More
-                    <ChevronRightIcon style={{ color: "#ffffff" }} />
-                  </a>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 };

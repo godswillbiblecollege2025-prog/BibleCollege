@@ -76,4 +76,3 @@ export const getBreadcrumbStructuredData = (items: Array<{ name: string; url: st
     "item": item.url
   }))
 })
-
