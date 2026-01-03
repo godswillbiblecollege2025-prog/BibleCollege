@@ -27,11 +27,20 @@ interface Event {
   is_active: boolean
 }
 
+interface RelatedEvent {
+  id: string
+  title: string
+  description: string
+  date: string
+  image_url: string | null
+  start_time: string | null
+}
+
 const EventDetail = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [event, setEvent] = useState<Event | null>(null)
-  const [relatedEvents, setRelatedEvents] = useState<Event[]>([])
+  const [relatedEvents, setRelatedEvents] = useState<RelatedEvent[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
