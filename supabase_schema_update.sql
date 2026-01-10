@@ -8,3 +8,4 @@ ADD COLUMN IF NOT EXISTS about_content TEXT;
 -- If you want to set a default value, you can use:
 -- ALTER TABLE news_events ADD COLUMN about_content TEXT DEFAULT '';
 
+
